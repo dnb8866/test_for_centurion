@@ -5,6 +5,7 @@ from utils.entities import Repository
 from utils.models_orm import ProductOrm, CategoryOrm
 from utils.schemas import Product, Category
 
+
 async def query_is_published_offset_limit(
         query: select,
         is_published: bool | None = None,
