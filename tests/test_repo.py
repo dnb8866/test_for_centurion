@@ -20,6 +20,7 @@ class TestProductRepo:
     async def test_get(self, session, product_repo, one_product_in_db):
         products = set(await session.execute(select(ProductOrm)))
         assert await product_repo.get(one_product_in_db.id) == Product.model_validate(one_product_in_db)
+        assert await product_repo.get(9999999999) is None
         assert set(await session.execute(select(ProductOrm))) == products
 
     async def test_list(self, session, product_repo, many_categories_and_products):
@@ -32,6 +33,7 @@ class TestProductRepo:
         assert created == sorted(created, reverse=True)
         assert len(await product_repo.list(max_price=4.9)) == 5
         assert len(await product_repo.list(min_price=94.5)) == 5
+        assert len(await product_repo.list(min_price=100000)) == 0
         assert set(await session.execute(select(ProductOrm))) == products
 
     async def test_update(self, session, product_repo, one_product_in_db):
@@ -64,6 +66,7 @@ class TestCategoryRepo:
     async def test_get(self, session, category_repo, one_category_in_db):
         categories = set(await session.execute(select(CategoryOrm)))
         assert await category_repo.get(one_category_in_db.id) == Category.model_validate(one_category_in_db)
+        assert await category_repo.get(9999999999) is None
         assert set(await session.execute(select(CategoryOrm))) == categories
 
     async def test_list(self, session, category_repo, many_categories_and_products):
@@ -73,6 +76,7 @@ class TestCategoryRepo:
         assert len(categories_query) == 5
         created = [category.created for category in categories_query]
         assert created == sorted(created, reverse=True)
+        assert len(await category_repo.list(name='Не существующая категория')) == 0
         assert set(await session.execute(select(CategoryOrm))) == categories
 
     async def test_update(self, session, category_repo, one_category_in_db):
