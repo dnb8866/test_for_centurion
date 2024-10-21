@@ -1,17 +1,17 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from random import randint, random
 
 import pytest
+from httpx import AsyncClient, ASGITransport
 from mimesis import Food
 from mimesis.locales import Locale
 from sqlalchemy.ext.asyncio import AsyncSession
-from unicodedata import category
 
 import config
-from utils.db import SqlAlchemyDb
-from utils.models_orm import Base, ProductOrm, CategoryOrm
-from utils.repositories import ProductRepository, CategoryRepository
+from src.main import app
+from src.utils.db import SqlAlchemyDb
+from src.utils.models_orm import Base, ProductOrm, CategoryOrm
+from src.utils.repositories import ProductRepository, CategoryRepository
 
 
 @pytest.fixture(scope="session")
@@ -89,3 +89,12 @@ async def many_categories_and_products(session: AsyncSession):
     session.add_all(categories)
     session.add_all(products)
     await session.commit()
+
+
+@pytest.fixture
+async def client():
+    async with AsyncClient(
+            transport=ASGITransport(app=app),
+            base_url='http://test'
+    ) as client:
+        yield client

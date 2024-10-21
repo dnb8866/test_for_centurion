@@ -1,8 +1,8 @@
 import pytest
 from sqlalchemy import select
 
-from utils.models_orm import ProductOrm, CategoryOrm
-from utils.schemas import Product, Category
+from src.utils.models_orm import ProductOrm, CategoryOrm
+from src.utils.schemas import Product, Category
 
 pytestmark = pytest.mark.asyncio
 
