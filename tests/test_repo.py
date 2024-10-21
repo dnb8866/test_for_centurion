@@ -1,13 +1,13 @@
 import pytest
 from sqlalchemy import select
 
-from utils.models_orm import ProductOrm
-from utils.schemas import Product
+from utils.models_orm import ProductOrm, CategoryOrm
+from utils.schemas import Product, Category
 
 pytestmark = pytest.mark.asyncio
 
 
-class TestProduct:
+class TestProductRepo:
 
     async def test_create(self, session, product_repo, one_product):
         products = set(await session.execute(select(ProductOrm)))
@@ -40,7 +40,7 @@ class TestProduct:
         updated_product = await product_repo.update(one_product_in_db)
         product = await product_repo.get(one_product_in_db.id)
         assert set(await session.execute(select(ProductOrm))) == products
-        assert updated_product.name == product.name
+        assert updated_product.name == 'Обновленное имя товара'
         assert updated_product.price == product.price
         assert updated_product.category_id == product.category_id
         assert updated_product.updated == product.updated
@@ -51,3 +51,42 @@ class TestProduct:
         products = set(await session.execute(select(ProductOrm)))
         await product_repo.delete(one_product_in_db.id)
         assert len(products - set(await session.execute(select(ProductOrm)))) == 1
+
+
+class TestCategoryRepo:
+
+    async def test_create(self, session, category_repo, one_category):
+        categories = set(await session.execute(select(CategoryOrm)))
+        created_product = await category_repo.create(one_category)
+        assert len(set(await session.execute(select(CategoryOrm))) - categories) == 1
+        assert one_category.name == created_product.name
+
+    async def test_get(self, session, category_repo, one_category_in_db):
+        categories = set(await session.execute(select(CategoryOrm)))
+        assert await category_repo.get(one_category_in_db.id) == Category.model_validate(one_category_in_db)
+        assert set(await session.execute(select(CategoryOrm))) == categories
+
+    async def test_list(self, session, category_repo, many_categories_and_products):
+        categories = set(await session.execute(select(CategoryOrm)))
+        assert len(await category_repo.list()) == 10
+        categories_query = await category_repo.list(limit=5)
+        assert len(categories_query) == 5
+        created = [category.created for category in categories_query]
+        assert created == sorted(created, reverse=True)
+        assert set(await session.execute(select(CategoryOrm))) == categories
+
+    async def test_update(self, session, category_repo, one_category_in_db):
+        categories = set(await session.execute(select(CategoryOrm)))
+        one_category_in_db.name = 'Обновленное имя категории'
+        updated_category = await category_repo.update(one_category_in_db)
+        category = await category_repo.get(one_category_in_db.id)
+        assert set(await session.execute(select(CategoryOrm))) == categories
+        assert updated_category.name == 'Обновленное имя категории'
+        assert updated_category.updated == category.updated
+        assert updated_category.created == category.created
+        assert updated_category.description == category.description
+
+    async def test_delete(self, session, category_repo, one_category_in_db):
+        categories = set(await session.execute(select(CategoryOrm)))
+        await category_repo.delete(one_category_in_db.id)
+        assert len(categories - set(await session.execute(select(CategoryOrm)))) == 1
