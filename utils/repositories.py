@@ -3,7 +3,7 @@ from sqlalchemy import select, update
 
 from utils.entities import Repository
 from utils.models_orm import ProductOrm, CategoryOrm
-from utils.schemas import Product, Category
+from utils.schemas import Product, Category, ProductBase, CategoryBase
 
 
 async def query_is_published_offset_limit(
@@ -22,11 +22,12 @@ async def query_is_published_offset_limit(
 
 
 class ProductRepository(Repository):
-    async def create(self, product: Product) -> Product:
+    async def create(self, product: ProductBase) -> Product:
         async with self.db.SessionLocal() as session:
             product_orm = ProductOrm.from_schema(product)
             session.add(product_orm)
             await session.commit()
+            await session.refresh(product_orm)
             return Product.model_validate(product_orm)
 
     async def get(self, product_id: int) -> Product | None:
@@ -102,14 +103,15 @@ class ProductRepository(Repository):
 
 
 class CategoryRepository(Repository):
-    async def create(self, category: Category) -> Category:
+    async def create(self, category: Category | CategoryBase) -> Category:
         async with self.db.SessionLocal() as session:
             category_orm = CategoryOrm.from_schema(category)
             session.add(category_orm)
             await session.commit()
+            await session.refresh(category_orm)
             return Category.model_validate(category_orm)
 
-    async def get(self, category_id: int):
+    async def get(self, category_id: int) -> Category | None:
         async with self.db.SessionLocal() as session:
             category_orm = (await session.execute(
                 select(CategoryOrm)
@@ -123,7 +125,7 @@ class CategoryRepository(Repository):
             limit: int | None = None,
             name: str | None = None,
             is_published: bool | None = None
-    ):
+    ) -> list[CategoryOrm] | None:
         query = select(CategoryOrm).order_by(CategoryOrm.created.desc())
         if name is not None:
             query = query.where(CategoryOrm.name.ilike(f'%{name}%'))
@@ -136,7 +138,7 @@ class CategoryRepository(Repository):
         async with self.db.SessionLocal() as session:
             return (await session.execute(query)).scalars().all()
 
-    async def update(self, category: Category):
+    async def update(self, category: Category) -> Category:
         async with self.db.SessionLocal() as session:
             await session.execute(
                 update(CategoryOrm)
@@ -152,7 +154,7 @@ class CategoryRepository(Repository):
             )).scalar_one_or_none()
             return Category.model_validate(category_orm)
 
-    async def delete(self, category_id: int):
+    async def delete(self, category_id: int) -> None:
         async with self.db.SessionLocal() as session:
             category_orm = (await session.execute(
                 select(CategoryOrm).where(CategoryOrm.id == category_id)

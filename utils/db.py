@@ -4,7 +4,6 @@ from sqlalchemy.pool import NullPool
 
 from utils.entities import Db
 
-
 class SqlAlchemyDb(Db):
     def __init__(self, sql_url, base: type[DeclarativeBase], test: bool = False):
         self.metadata = base.metadata

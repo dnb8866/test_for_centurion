@@ -4,7 +4,7 @@ from decimal import Decimal
 from sqlalchemy import ForeignKey, BigInteger, TIMESTAMP, func, true, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 
-from utils.schemas import Category, Product
+from utils.schemas import Category, Product, ProductBase
 
 
 class Base(DeclarativeBase):
@@ -53,7 +53,7 @@ class ProductOrm(CreatedUpdatedBase, IsPublishedBase):
     category: Mapped[CategoryOrm] = relationship("CategoryOrm", back_populates="products")
 
     @classmethod
-    def from_schema(cls, schema: Product):
+    def from_schema(cls, schema: Product | ProductBase):
         return cls(
             id=schema.id if 'id' in schema.__dict__ else None,
             name=schema.name,
