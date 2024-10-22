@@ -7,29 +7,28 @@ from mimesis import Food
 from mimesis.locales import Locale
 from sqlalchemy.ext.asyncio import AsyncSession
 
-import config
+from src import engine
 from src.main import app
-from src.utils.db import SqlAlchemyDb
-from src.utils.models_orm import Base, ProductOrm, CategoryOrm
+from src.utils.models_orm import ProductOrm, CategoryOrm
 from src.utils.repositories import ProductRepository, CategoryRepository
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def anyio_backend():
     return "asyncio"
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def db():
-    return SqlAlchemyDb(config.SQLALCHEMY_DATABASE_URL_TEST, Base, test=True)
+    return engine.sql_db
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def category_repo(db):
     return CategoryRepository(db)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def product_repo(db):
     return ProductRepository(db)
 
@@ -44,7 +43,7 @@ async def session(db):
 
 @pytest.fixture
 def one_category():
-    return CategoryOrm(name="Test Category")
+    return CategoryOrm(name='Test Category')
 
 
 @pytest.fixture
@@ -57,7 +56,7 @@ async def one_category_in_db(session: AsyncSession, one_category):
 
 @pytest.fixture
 def one_product(one_category_in_db):
-    return ProductOrm(name="Продукт 1", price=Decimal('100.2'), category_id=one_category_in_db.id)
+    return ProductOrm(name='Продукт 1', price=Decimal('100.2'), category_id=one_category_in_db.id)
 
 
 @pytest.fixture

@@ -1,7 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
 from src.engine import product_repo
-from src.utils.decorators import try_except
 from src.utils.schemas import ProductBase, Product
 
 router = APIRouter(
@@ -11,7 +10,6 @@ router = APIRouter(
 
 
 @router.get('')
-# @try_except(detail='Ошибка получения списка продуктов')
 async def get_products(
     offset: int = None,
     limit: int = None,
@@ -43,9 +41,7 @@ async def get_products(
 
 
 @router.post('', status_code=status.HTTP_201_CREATED, response_model=Product)
-# @try_except(detail='Ошибка создания продукта')
 async def create_product(product: ProductBase):
-    print(product)
     try:
         res = await product_repo.create(product)
     except Exception as e:
@@ -59,7 +55,6 @@ async def create_product(product: ProductBase):
 
 
 @router.get('/{product_id}', response_model=Product)
-@try_except(detail='Ошибка получение продукта')
 async def get_product(product_id: int):
     product = await product_repo.get(product_id)
     if not product:
@@ -72,12 +67,10 @@ async def get_product(product_id: int):
 
 
 @router.post('/{product_id}', response_model=Product)
-@try_except(detail='Ошибка обновления продукта')
 async def update_product(product: Product):
     return await product_repo.update(product)
 
 
 @router.delete('/{product_id}', status_code=status.HTTP_204_NO_CONTENT)
-@try_except(detail='Ошибка удаления продукта')
 async def delete_product(product_id: int):
     await product_repo.delete(product_id)
