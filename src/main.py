@@ -1,4 +1,4 @@
-from fastapi import status, HTTPException, FastAPI
+from fastapi import status, HTTPException
 
 from src.engine import app, product_repo
 from src.utils.decorators import try_except

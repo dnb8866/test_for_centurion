@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "test-for-centurion"
+name = "src"
 version = "0.1.0"
 description = ""
 authors = ["Denis Ivanov <dnb8866@gmail.com>"]
