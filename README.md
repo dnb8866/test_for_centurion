@@ -1,3 +1,4 @@
+# Тестовое задание на FastAPI с использованием SQLAlchemy, Poetry, Alembic, Pytest
 # Сервис REST API для управления продуктами.
 
 ## Установка
