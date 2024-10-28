@@ -66,7 +66,7 @@ async def get_product(product_id: int):
 
 
 
-@router.post('/{product_id}', response_model=Product)
+@router.put('/{product_id}', response_model=Product)
 async def update_product(product: Product):
     return await product_repo.update(product)
 
