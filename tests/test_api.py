@@ -55,7 +55,7 @@ async def test_update_products(client, one_product_in_db):
         'price': 105.5,
         'category_id': 1
     }
-    response = await client.post(f'/products/{one_product_in_db.id}', json=data)
+    response = await client.put(f'/products/{one_product_in_db.id}', json=data)
     assert response.status_code == 200
     assert response.json()['name'] == 'Обновленный тестовый продукт'
     assert response.json()['price'] == '105.5'

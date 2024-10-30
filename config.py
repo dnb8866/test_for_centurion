@@ -5,7 +5,7 @@ dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-MODE = ''  # Установите 'TEST' для запуска тестов или '' в остальных случаях.
+MODE = 'TEST'  # Установите 'TEST' для запуска тестов или '' в остальных случаях.
 
 """
 POSTGRESQL
